@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>QGIS2leaf webmap</title>
+    
+        <meta charset="utf-8" />
+        <link rel="stylesheet" href="css/leaflet.css" />
+        <link rel="stylesheet" href="css/MarkerCluster.css" />
+        <link rel="stylesheet" href="css/MarkerCluster.Default.css" />
+        <link rel="stylesheet" type="text/css" href="css/qgis2web.css">
+        <link rel="stylesheet" href="css/label.css" />
+        <script src="js/leaflet.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/label.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/leaflet.markercluster.js"></script>
+        <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    </head>
+    <body>
+        <div id="map"></div>
+        <script src="data/json_kompl.js"></script>
+        <script src="data/json_CWk22.js"></script>
+        <script>
+        var map = L.map('map', {
+            zoomControl:true, maxZoom:28, minZoom:1
+        })
+        var hash = new L.Hash(map);
+        var additional_attrib = '<a href="https://github.com/tomchadwin/qgis2web" target ="_blank">qgis2web</a>';
+        var feature_group = new L.featureGroup([]);
+        var raster_group = new L.LayerGroup([]);
+        var basemap = L.tileLayer('http://a.tile.stamen.com/toner/{z}/{x}/{y}.png', {
+            attribution: additional_attrib + ' Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data: &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors,<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
+        });
+        basemap.addTo(map);
+        var layerOrder = new Array();
+        function restackLayers() {
+            for (index = 0; index < layerOrder.length; index++) {
+                layerOrder[index].bringToFront();
+            }
+        }
+        map.on('overlayadd', restackLayers);
+        layerControl = L.control.layers({},{},{collapsed:false});
+        function pop_kompl(feature, layer) {
+            var popupContent = '<table><tr><th scope="row">id</th><td>' + Autolinker.link(String(feature.properties['id'])) + '</td></tr><tr><th scope="row">name</th><td>' + Autolinker.link(String(feature.properties['name'])) + '</td></tr></table>';
+            layer.bindPopup(popupContent);
+        }
+
+        function doStylekompl(feature) {
+            return {
+                weight: 0000,
+                color: '#ffffbf',
+                fillColor: '#ff7f00',
+                dashArray: '',
+                opacity: 0.85,
+                fillOpacity: 0.85
+            };
+        }
+            var json_komplJSON = new L.geoJson(json_kompl, {
+                onEachFeature: pop_kompl,
+                style: doStylekompl
+            });
+            layerOrder[layerOrder.length] = json_komplJSON;
+        layerOrder[layerOrder.length] = json_komplJSON;
+        for (index = 0; index < layerOrder.length; index++) {
+            feature_group.removeLayer(layerOrder[index]); feature_group.addLayer(layerOrder[index]);
+        }
+        //add comment sign to hide this layer on the map in the initial view.
+        feature_group.addLayer(json_komplJSON);
+        function pop_CWk22(feature, layer) {
+            var popupContent = '<table><tr><th scope="row">OSM_ID</th><td>' + Autolinker.link(String(feature.properties['OSM_ID'])) + '</td></tr><tr><th scope="row">kod</th><td>' + Autolinker.link(String(feature.properties['kod'])) + '</td></tr><tr><th scope="row">id</th><td>' + Autolinker.link(String(feature.properties['id'])) + '</td></tr><tr><th scope="row">idKompl</th><td>' + Autolinker.link(String(feature.properties['idKompl'])) + '</td></tr><tr><th scope="row">nameKompl</th><td>' + Autolinker.link(String(feature.properties['nameKompl'])) + '</td></tr><tr><th scope="row">_pageUrl</th><td>' + Autolinker.link(String(feature.properties['_pageUrl'])) + '</td></tr><tr><th scope="row">name</th><td>' + Autolinker.link(String(feature.properties['name'])) + '</td></tr><tr><th scope="row">addres</th><td>' + Autolinker.link(String(feature.properties['addres'])) + '</td></tr><tr><th scope="row">arch</th><td>' + Autolinker.link(String(feature.properties['arch'])) + '</td></tr><tr><th scope="row">year</th><td>' + Autolinker.link(String(feature.properties['year'])) + '</td></tr><tr><th scope="row">comm</th><td>' + Autolinker.link(String(feature.properties['comm'])) + '</td></tr><tr><th scope="row">wievs</th><td>' + Autolinker.link(String(feature.properties['wievs'])) + '</td></tr><tr><th scope="row">votes</th><td>' + Autolinker.link(String(feature.properties['votes'])) + '</td></tr><tr><th scope="row">photo</th><td>' + Autolinker.link(String(feature.properties['photo'])) + '</td></tr></table>';
+            layer.bindPopup(popupContent);
+        }
+
+        function doStyleCWk22(feature) {
+            return {
+                weight: 0000,
+                color: '#000000',
+                fillColor: '#ff7f00',
+                dashArray: '',
+                opacity: 1.0,
+                fillOpacity: 1.0
+            };
+        }
+            var json_CWk22JSON = new L.geoJson(json_CWk22, {
+                onEachFeature: pop_CWk22,
+                style: doStyleCWk22
+            });
+            layerOrder[layerOrder.length] = json_CWk22JSON;
+        layerOrder[layerOrder.length] = json_CWk22JSON;
+        for (index = 0; index < layerOrder.length; index++) {
+            feature_group.removeLayer(layerOrder[index]); feature_group.addLayer(layerOrder[index]);
+        }
+        //add comment sign to hide this layer on the map in the initial view.
+        feature_group.addLayer(json_CWk22JSON);
+        raster_group.addTo(map);
+        feature_group.addTo(map);
+        var baseMaps = {
+            'Stamen Toner': basemap
+        };
+            L.control.layers(baseMaps,{'<img src="legend/CWk22.png" /> CWk2_2': json_CWk22JSON,'<img src="legend/kompl.png" /> kompl': json_komplJSON},{collapsed:false}).addTo(map);
+        map.fitBounds(feature_group.getBounds());
+        L.control.scale({options: {position: 'bottomleft',maxWidth: 100,metric: true,imperial: false,updateWhenIdle: false}}).addTo(map);
+    </script>
+</body>
+</html>
